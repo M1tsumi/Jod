@@ -1,0 +1,12 @@
+[
+  {
+    "name": "io.github.m1tsumi.jod.result.ValidationResult",
+    "queryAllPublicConstructors": true,
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "io.github.m1tsumi.jod.error.ValidationError",
+    "queryAllPublicConstructors": true,
+    "queryAllPublicMethods": true
+  }
+]
