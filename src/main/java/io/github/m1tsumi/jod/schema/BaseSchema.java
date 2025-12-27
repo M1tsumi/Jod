@@ -48,4 +48,16 @@ public interface BaseSchema<T> {
      * @return a schema with the additional rule
      */
     BaseSchema<T> custom(java.util.function.Predicate<T> rule, String message);
+    
+    /**
+     * Adds a transformation function to be applied to validated values.
+     * 
+     * @param transform the transformation function
+     * @return a schema with transformation
+     */
+    default BaseSchema<T> transform(java.util.function.Function<T, T> transform) {
+        // Default implementation returns this for backward compatibility
+        // Subclasses should override to provide actual transformation
+        return this;
+    }
 }

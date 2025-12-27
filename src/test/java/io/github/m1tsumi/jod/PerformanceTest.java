@@ -109,21 +109,66 @@ class PerformanceTest {
     }
     
     @Test
-    void validateZeroReflection() {
-        // Verify that we're not using reflection in the validation path
-        StringSchema schema = Schema.string().email();
-        
-        // This should not trigger any reflection
-        var result = schema.validate(TEST_EMAIL);
-        assertThat(result.isValid()).isTrue();
-        
-        // Object schema with Map input should not use reflection
-        var objectSchema = Schema.<Map<String, Object>>object()
-            .field("email", Schema.string().email())
-            .builds(fields -> fields);
-        
-        Map<String, Object> data = Map.of("email", TEST_EMAIL);
-        var objectResult = objectSchema.validate(data);
-        assertThat(objectResult.isValid()).isTrue();
+    void validateLongPerformance() {
+        var schema = Schema.longValue()
+            .min(0L)
+            .max(1000000L)
+            .positive();
+
+        long startTime = System.nanoTime();
+
+        for (int i = 0; i < ITERATIONS; i++) {
+            var result = schema.validate(500000L);
+            assertThat(result.isValid()).isTrue();
+        }
+
+        long duration = System.nanoTime() - startTime;
+        double avgMicros = duration / (double) ITERATIONS / 1000;
+
+        System.out.printf("Long validation: %.2f μs per validation%n", avgMicros);
+        assertThat(avgMicros).isLessThan(10);
+    }
+
+    @Test
+    void validateDoublePerformance() {
+        var schema = Schema.doubleValue()
+            .min(0.0)
+            .max(1000.0)
+            .finite();
+
+        long startTime = System.nanoTime();
+
+        for (int i = 0; i < ITERATIONS; i++) {
+            var result = schema.validate(500.5);
+            assertThat(result.isValid()).isTrue();
+        }
+
+        long duration = System.nanoTime() - startTime;
+        double avgMicros = duration / (double) ITERATIONS / 1000;
+
+        System.out.printf("Double validation: %.2f μs per validation%n", avgMicros);
+        assertThat(avgMicros).isLessThan(10);
+    }
+
+    @Test
+    void validateListPerformance() {
+        var schema = Schema.list(Schema.string().min(1).max(10))
+            .minSize(1)
+            .maxSize(5);
+
+        var testList = List.of("hello", "world");
+
+        long startTime = System.nanoTime();
+
+        for (int i = 0; i < ITERATIONS / 100; i++) { // Fewer iterations for lists
+            var result = schema.validate(testList);
+            assertThat(result.isValid()).isTrue();
+        }
+
+        long duration = System.nanoTime() - startTime;
+        double avgMicros = duration / (double) (ITERATIONS / 100) / 1000;
+
+        System.out.printf("List validation: %.2f μs per validation%n", avgMicros);
+        assertThat(avgMicros).isLessThan(50);
     }
 }

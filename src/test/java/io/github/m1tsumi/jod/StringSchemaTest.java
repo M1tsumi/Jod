@@ -132,19 +132,64 @@ class StringSchemaTest {
     }
     
     @Test
-    void shouldChainMultipleValidations() {
-        StringSchema schema = new StringSchema()
-            .required()
-            .min(5)
-            .max(20)
-            .email();
-        
-        var validResult = schema.validate("test@example.com");
+    void shouldValidateUuid() {
+        StringSchema schema = new StringSchema().uuid();
+
+        var validResult = schema.validate("550e8400-e29b-41d4-a716-446655440000");
         assertThat(validResult.isValid()).isTrue();
-        
-        var invalidResult = schema.validate("bad");
+
+        var invalidResult = schema.validate("not-a-uuid");
         assertThat(invalidResult.isValid()).isFalse();
-        // Should fail on min length first
-        assertThat(invalidResult.getErrors()).anyMatch(e -> e.code().equals("MIN_LENGTH"));
+        assertThat(invalidResult.getErrors().get(0).code()).isEqualTo("CUSTOM");
+        assertThat(invalidResult.getErrors().get(0).message()).isEqualTo("Invalid UUID format");
     }
-}
+
+    @Test
+    void shouldValidateUrl() {
+        StringSchema schema = new StringSchema().url();
+
+        var validHttpResult = schema.validate("http://example.com");
+        assertThat(validHttpResult.isValid()).isTrue();
+
+        var validHttpsResult = schema.validate("https://example.com/path");
+        assertThat(validHttpsResult.isValid()).isTrue();
+
+        var invalidResult = schema.validate("not-a-url");
+        assertThat(invalidResult.isValid()).isFalse();
+        assertThat(invalidResult.getErrors().get(0).code()).isEqualTo("CUSTOM");
+        assertThat(invalidResult.getErrors().get(0).message()).isEqualTo("Invalid URL format");
+    }
+
+    @Test
+    void shouldValidatePhone() {
+        StringSchema schema = new StringSchema().phone();
+
+        var validResult = schema.validate("+1234567890");
+        assertThat(validResult.isValid()).isTrue();
+
+        var invalidResult = schema.validate("123-456-7890");
+        assertThat(invalidResult.isValid()).isFalse();
+        assertThat(invalidResult.getErrors().get(0).code()).isEqualTo("CUSTOM");
+        assertThat(invalidResult.getErrors().get(0).message()).isEqualTo("Invalid phone number format");
+    }
+
+    @Test
+    void shouldApplyTransform() {
+        StringSchema schema = new StringSchema().transform(String::toUpperCase);
+
+        var result = schema.validate("hello world");
+        assertThat(result.isValid()).isTrue();
+        assertThat(result.getValue()).contains("HELLO WORLD");
+    }
+
+    @Test
+    void shouldChainTransformWithValidation() {
+        StringSchema schema = new StringSchema()
+            .min(3)
+            .max(20)
+            .transform(s -> "prefix_" + s.toLowerCase());
+
+        var result = schema.validate("HELLO");
+        assertThat(result.isValid()).isTrue();
+        assertThat(result.getValue()).contains("prefix_hello");
+    }

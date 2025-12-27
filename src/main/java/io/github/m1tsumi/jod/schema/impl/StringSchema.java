@@ -19,6 +19,7 @@ public class StringSchema implements BaseSchema<String> {
     private final String pattern;
     private final boolean email;
     private final List<CustomRule<String>> customRules;
+    private final java.util.function.Function<String, String> transform;
     
     private record CustomRule<T>(Predicate<T> predicate, String message) {}
     
@@ -28,7 +29,8 @@ public class StringSchema implements BaseSchema<String> {
         Integer maxLength,
         String pattern,
         boolean email,
-        List<CustomRule<String>> customRules
+        List<CustomRule<String>> customRules,
+        java.util.function.Function<String, String> transform
     ) {
         this.required = required;
         this.minLength = minLength;
@@ -36,10 +38,11 @@ public class StringSchema implements BaseSchema<String> {
         this.pattern = pattern;
         this.email = email;
         this.customRules = customRules;
+        this.transform = transform != null ? transform : java.util.function.Function.identity();
     }
     
     public StringSchema() {
-        this(false, null, null, null, false, List.of());
+        this(false, null, null, null, false, List.of(), null);
     }
     
     @Override
@@ -109,25 +112,30 @@ public class StringSchema implements BaseSchema<String> {
         }
         
         return errors.isEmpty() 
-            ? ValidationResult.success(value)
+            ? ValidationResult.success(transform.apply(value))
             : ValidationResult.failure(errors);
     }
     
     @Override
     public StringSchema required() {
-        return new StringSchema(true, minLength, maxLength, pattern, email, customRules);
+        return new StringSchema(true, minLength, maxLength, pattern, email, customRules, transform);
     }
     
     @Override
     public StringSchema optional() {
-        return new StringSchema(false, minLength, maxLength, pattern, email, customRules);
+        return new StringSchema(false, minLength, maxLength, pattern, email, customRules, transform);
     }
     
     @Override
     public StringSchema custom(Predicate<String> rule, String message) {
         List<CustomRule<String>> newRules = new ArrayList<>(customRules);
         newRules.add(new CustomRule<>(rule, message));
-        return new StringSchema(required, minLength, maxLength, pattern, email, newRules);
+        return new StringSchema(required, minLength, maxLength, pattern, email, newRules, transform);
+    }
+    
+    @Override
+    public StringSchema transform(java.util.function.Function<String, String> transform) {
+        return new StringSchema(required, minLength, maxLength, pattern, email, customRules, transform);
     }
     
     /**
@@ -137,7 +145,7 @@ public class StringSchema implements BaseSchema<String> {
      * @return a new schema with min length validation
      */
     public StringSchema min(int minLength) {
-        return new StringSchema(required, minLength, maxLength, pattern, email, customRules);
+        return new StringSchema(required, minLength, maxLength, pattern, email, customRules, transform);
     }
     
     /**
@@ -147,7 +155,7 @@ public class StringSchema implements BaseSchema<String> {
      * @return a new schema with max length validation
      */
     public StringSchema max(int maxLength) {
-        return new StringSchema(required, minLength, maxLength, pattern, email, customRules);
+        return new StringSchema(required, minLength, maxLength, pattern, email, customRules, transform);
     }
     
     /**
@@ -158,7 +166,7 @@ public class StringSchema implements BaseSchema<String> {
      * @return a new schema with length validation
      */
     public StringSchema length(int minLength, int maxLength) {
-        return new StringSchema(required, minLength, maxLength, pattern, email, customRules);
+        return new StringSchema(required, minLength, maxLength, pattern, email, customRules, transform);
     }
     
     /**
@@ -168,7 +176,7 @@ public class StringSchema implements BaseSchema<String> {
      * @return a new schema with pattern validation
      */
     public StringSchema regex(String regex) {
-        return new StringSchema(required, minLength, maxLength, regex, email, customRules);
+        return new StringSchema(required, minLength, maxLength, regex, email, customRules, transform);
     }
     
     /**
@@ -177,7 +185,7 @@ public class StringSchema implements BaseSchema<String> {
      * @return a new schema with email validation
      */
     public StringSchema email() {
-        return new StringSchema(required, minLength, maxLength, pattern, true, customRules);
+        return new StringSchema(required, minLength, maxLength, pattern, true, customRules, transform);
     }
     
     /**
@@ -192,6 +200,33 @@ public class StringSchema implements BaseSchema<String> {
     }
     
     /**
+     * Requires the string to be a valid UUID.
+     * 
+     * @return a new schema with UUID validation
+     */
+    public StringSchema uuid() {
+        return custom(this::isValidUuid, "Invalid UUID format");
+    }
+    
+    /**
+     * Requires the string to be a valid URL.
+     * 
+     * @return a new schema with URL validation
+     */
+    public StringSchema url() {
+        return custom(this::isValidUrl, "Invalid URL format");
+    }
+    
+    /**
+     * Requires the string to be a valid phone number (E.164 format).
+     * 
+     * @return a new schema with phone number validation
+     */
+    public StringSchema phone() {
+        return custom(this::isValidPhone, "Invalid phone number format");
+    }
+    
+    /**
      * Basic email validation using regex.
      * This is a simplified version - production use should consider more sophisticated validation.
      */
@@ -199,5 +234,32 @@ public class StringSchema implements BaseSchema<String> {
         if (email == null) return false;
         String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
         return email.matches(emailRegex);
+    }
+    
+    /**
+     * UUID validation using regex.
+     */
+    private boolean isValidUuid(String uuid) {
+        if (uuid == null) return false;
+        String uuidRegex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+        return uuid.matches(uuidRegex);
+    }
+    
+    /**
+     * Basic URL validation using regex.
+     */
+    private boolean isValidUrl(String url) {
+        if (url == null) return false;
+        String urlRegex = "^https?://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(/.*)?$";
+        return url.matches(urlRegex);
+    }
+    
+    /**
+     * Basic phone number validation (E.164 format).
+     */
+    private boolean isValidPhone(String phone) {
+        if (phone == null) return false;
+        String phoneRegex = "^\\+[1-9]\\d{1,14}$";
+        return phone.matches(phoneRegex);
     }
 }
