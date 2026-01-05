@@ -1,10 +1,14 @@
 package io.github.m1tsumi.jod.schema;
 
 import io.github.m1tsumi.jod.result.ValidationResult;
+import io.github.m1tsumi.jod.schema.impl.BigIntegerSchema;
 import io.github.m1tsumi.jod.schema.impl.BooleanSchema;
 import io.github.m1tsumi.jod.schema.impl.DoubleSchema;
 import io.github.m1tsumi.jod.schema.impl.IntegerSchema;
 import io.github.m1tsumi.jod.schema.impl.ListSchema;
+import io.github.m1tsumi.jod.schema.impl.LocalDateSchema;
+import io.github.m1tsumi.jod.schema.impl.LocalDateTimeSchema;
+import io.github.m1tsumi.jod.schema.impl.LocalTimeSchema;
 import io.github.m1tsumi.jod.schema.impl.LongSchema;
 import io.github.m1tsumi.jod.schema.impl.ObjectSchema;
 import io.github.m1tsumi.jod.schema.impl.StringSchema;
@@ -63,6 +67,42 @@ public final class Schema {
      */
     public static DoubleSchema doubleValue() {
         return new DoubleSchema();
+    }
+    
+    /**
+     * Creates a schema for LocalDate values.
+     * 
+     * @return a LocalDate schema builder
+     */
+    public static LocalDateSchema localDate() {
+        return new LocalDateSchema();
+    }
+    
+    /**
+     * Creates a schema for LocalDateTime values.
+     * 
+     * @return a LocalDateTime schema builder
+     */
+    public static LocalDateTimeSchema localDateTime() {
+        return new LocalDateTimeSchema();
+    }
+    
+    /**
+     * Creates a schema for LocalTime values.
+     * 
+     * @return a LocalTime schema builder
+     */
+    public static LocalTimeSchema localTime() {
+        return new LocalTimeSchema();
+    }
+    
+    /**
+     * Creates a schema for BigInteger values.
+     * 
+     * @return a BigInteger schema builder
+     */
+    public static BigIntegerSchema bigInteger() {
+        return new BigIntegerSchema();
     }
     
     /**

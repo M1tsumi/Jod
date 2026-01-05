@@ -227,6 +227,26 @@ public class StringSchema implements BaseSchema<String> {
     }
     
     /**
+     * Requires the string to be a valid credit card number.
+     * 
+     * @return a new schema with credit card validation
+     */
+    public StringSchema creditCard() {
+        return custom(this::isValidCreditCard, "Invalid credit card number");
+    }
+    
+    /**
+     * Requires the string to be a valid postal code for the specified country.
+     * 
+     * @param countryCode the ISO 3166-1 alpha-2 country code (e.g., "US", "GB", "CA")
+     * @return a new schema with postal code validation
+     */
+    public StringSchema postalCode(String countryCode) {
+        return custom(s -> isValidPostalCode(s, countryCode), 
+                     "Invalid postal code for country: " + countryCode);
+    }
+    
+    /**
      * Basic email validation using regex.
      * This is a simplified version - production use should consider more sophisticated validation.
      */
@@ -261,5 +281,46 @@ public class StringSchema implements BaseSchema<String> {
         if (phone == null) return false;
         String phoneRegex = "^\\+[1-9]\\d{1,14}$";
         return phone.matches(phoneRegex);
+    }
+    
+    /**
+     * Basic credit card validation using Luhn algorithm.
+     */
+    private boolean isValidCreditCard(String cardNumber) {
+        if (cardNumber == null) return false;
+        // Remove spaces and dashes
+        String cleaned = cardNumber.replaceAll("[\\s-]", "");
+        if (!cleaned.matches("\\d{13,19}")) return false;
+        
+        // Luhn algorithm
+        int sum = 0;
+        boolean alternate = false;
+        for (int i = cleaned.length() - 1; i >= 0; i--) {
+            int digit = cleaned.charAt(i) - '0';
+            if (alternate) {
+                digit *= 2;
+                if (digit > 9) digit -= 9;
+            }
+            sum += digit;
+            alternate = !alternate;
+        }
+        return sum % 10 == 0;
+    }
+    
+    /**
+     * Basic postal code validation for various countries.
+     */
+    private boolean isValidPostalCode(String postalCode, String countryCode) {
+        if (postalCode == null || countryCode == null) return false;
+        
+        return switch (countryCode.toUpperCase()) {
+            case "US" -> postalCode.matches("\\d{5}(-\\d{4})?");
+            case "GB" -> postalCode.matches("[A-Z]{1,2}\\d[A-Z\\d]? \\d[A-Z]{2}");
+            case "CA" -> postalCode.matches("[A-Z]\\d[A-Z] \\d[A-Z]\\d");
+            case "DE" -> postalCode.matches("\\d{5}");
+            case "FR" -> postalCode.matches("\\d{5}");
+            case "AU" -> postalCode.matches("\\d{4}");
+            default -> postalCode.length() >= 3 && postalCode.length() <= 10; // Generic fallback
+        };
     }
 }

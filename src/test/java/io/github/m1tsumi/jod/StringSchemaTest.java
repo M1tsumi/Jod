@@ -174,6 +174,38 @@ class StringSchemaTest {
     }
 
     @Test
+    void shouldValidateCreditCard() {
+        StringSchema schema = new StringSchema().creditCard();
+
+        var validResult = schema.validate("4532015112830366"); // Valid Visa test number
+        assertThat(validResult.isValid()).isTrue();
+
+        var invalidResult = schema.validate("1234567890123456");
+        assertThat(invalidResult.isValid()).isFalse();
+        assertThat(invalidResult.getErrors().get(0).code()).isEqualTo("CUSTOM");
+        assertThat(invalidResult.getErrors().get(0).message()).isEqualTo("Invalid credit card number");
+    }
+
+    @Test
+    void shouldValidatePostalCode() {
+        // US postal code
+        var usSchema = new StringSchema().postalCode("US");
+        assertThat(usSchema.validate("12345").isValid()).isTrue();
+        assertThat(usSchema.validate("12345-6789").isValid()).isTrue();
+        assertThat(usSchema.validate("1234").isValid()).isFalse();
+
+        // UK postal code
+        var gbSchema = new StringSchema().postalCode("GB");
+        assertThat(gbSchema.validate("SW1A 1AA").isValid()).isTrue();
+        assertThat(gbSchema.validate("12345").isValid()).isFalse();
+
+        // Canada postal code
+        var caSchema = new StringSchema().postalCode("CA");
+        assertThat(caSchema.validate("K1A 0A6").isValid()).isTrue();
+        assertThat(caSchema.validate("12345").isValid()).isFalse();
+    }
+
+    @Test
     void shouldApplyTransform() {
         StringSchema schema = new StringSchema().transform(String::toUpperCase);
 

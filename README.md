@@ -14,7 +14,7 @@
     <img src="https://img.shields.io/badge/website-quefep.uk-blue" alt="Website: quefep.uk">
   </a>
   <a href="https://github.com/M1tsumi/Jod/releases">
-    <img src="https://img.shields.io/badge/version-0.2.0-green" alt="Version 0.2.0">
+    <img src="https://img.shields.io/badge/version-0.3.0-green" alt="Version 0.3.0">
   </a>
   <a href="https://github.com/M1tsumi/Jod/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="Apache 2.0 License">
@@ -76,13 +76,13 @@ var result = userSchema.validate(userData);
 <dependency>
     <groupId>io.github.m1tsumi</groupId>
     <artifactId>jod</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
 #### Gradle
 ```gradle
-implementation 'io.github.m1tsumi:jod:0.2.0'
+implementation 'io.github.m1tsumi:jod:0.3.0'
 ```
 
 ### Your First Validation
@@ -137,14 +137,14 @@ That's it! You've got type-safe validation with detailed error reporting.
 <dependency>
     <groupId>io.github.m1tsumi</groupId>
     <artifactId>jod</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```gradle
-implementation 'io.github.m1tsumi:jod:0.2.0'
+implementation 'io.github.m1tsumi:jod:0.3.0'
 ```
 
 ## 📚 Complete API Reference
