@@ -8,86 +8,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0] - 2026-01-04
 
 ### Added
-- **Date/Time Schemas**: New `Schema.localDate()`, `Schema.localDateTime()`, and `Schema.localTime()` for temporal validation with min/max constraints, past/future validation
-- **BigInteger Schema**: New `Schema.bigInteger()` for arbitrary-precision integer validation with min/max/range, positive/non-negative constraints
-- **Credit Card Validation**: Added `.creditCard()` method to StringSchema for credit card number validation
-- **Postal Code Validation**: Added `.postalCode(countryCode)` method to StringSchema for postal code validation supporting multiple countries
+- Temporal validation: `Schema.localDate()`, `Schema.localDateTime()`, `Schema.localTime()` with min/max and past/future constraints
+- `Schema.bigInteger()` for arbitrary-precision integer validation
+- `.creditCard()` method for Luhn algorithm validation
+- `.postalCode(countryCode)` for international postal code validation (US, UK, CA, DE, FR, AU)
 
 ### Enhanced
-- **Transform Support**: Improved transform functionality with proper chaining across all schemas
-- **Error Messages**: Enhanced error messages for temporal validations with better formatting
+- Transform chaining and composition across all schemas
+- Error message formatting for temporal validations
 
 ### Fixed
-- **Schema Composition**: Fixed issues with `.and()` and `.or()` methods in complex schema combinations
-
-### Changed
-- **API Stability**: All existing APIs remain backward compatible
-
-### Deprecated
-- None
-
-### Removed
-- None
+- Schema composition stability with `.and()` and `.or()` methods
 
 ### Performance
-- Date/Time validation: ~5-15 μs per validation (new)
-- Maintained performance characteristics for existing schemas
+- Temporal validation: ~5-15 μs per operation (new)
 
 ## [0.2.0] - 2025-12-27
 
 ### Added
-- **Long Schema**: New `Schema.long()` for 64-bit integer validation with min/max/range, positive/non-negative constraints
-- **Double Schema**: New `Schema.double()` for floating-point number validation with min/max/range, positive/non-negative constraints
-- **List Schema**: New `Schema.list(elementSchema)` for validating collections and arrays
-- **UUID Validation**: Added `.uuid()` method to StringSchema for UUID format validation
-- **URL Validation**: Added `.url()` method to StringSchema for URL format validation
-- **Phone Validation**: Added `.phone()` method to StringSchema for international phone number validation (E.164)
-- **Union Schemas**: New `Schema.union(schema1, schema2, ...)` for validating one of multiple possible schemas
-- **Transform Functionality**: Added `.transform()` method to all schemas for value transformation during validation
-- **Custom Error Messages**: Enhanced error message customization with `.message()` methods on all validators
-- **Schema Composition**: Added `.and()`, `.or()` methods for combining schemas
-- **Enum Validation**: Enhanced `oneOf()` to work with any type, not just strings
-- **Array Support**: ListSchema now supports arrays and other Iterable types
+- Numeric schemas: `Schema.long()`, `Schema.double()` with range constraints
+- Collection validation: `Schema.list(elementSchema)` with min/max size
+- String format validators: `.uuid()`, `.url()`, `.phone()` (E.164)
+- Schema composition: `.union()`, `.and()`, `.or()` for complex validations
+- `.transform()` method for value transformation and normalization
+- `oneOf()` now supports any value type (not just strings)
+- Array and Iterable support in ListSchema
 
 ### Enhanced
-- **Error Details**: Improved error messages with more context and better formatting
-- **Performance**: Optimized validation performance for complex object schemas
-- **Type Safety**: Enhanced generic type safety across all schema types
-- **Pattern Matching**: Better support for pattern matching with new result types
+- Error messages with improved context and detail
+- Validation performance for complex objects
+- Generic type safety across schemas
+- Pattern matching support in results
 
 ### Fixed
-- **Email Regex**: Improved email validation regex to handle more edge cases
-- **Null Handling**: Better null value handling in nested object validation
-- **Memory Usage**: Reduced memory allocation in validation loops
-
-### Changed
-- **API Stability**: All existing APIs remain backward compatible
-- **Error Codes**: Standardized error codes across all schema types
-- **Validation Order**: Consistent validation rule execution order
-
-### Deprecated
-- None
-
-### Removed
-- None
+- Email regex validation for edge cases
+- Null handling in nested objects
+- Memory efficiency in validation loops
 
 ### Performance
-- String validation: ~1-5 μs per validation (unchanged)
-- Object validation: ~10-30 μs per validation (unchanged)
-- New schema types maintain similar performance characteristics
-- Memory usage remains under 5MB for typical workloads
+- String: ~1-5 μs | Object: ~10-30 μs | Memory: <5MB
 
 ## [0.1.0] - 2025-01-15
 
 ### Added
-- Initial release of Jod validation library
-- String validation with length, regex, email, and custom rules
-- Integer validation with range and positivity constraints
-- Boolean validation with true/false requirements
+- Core schemas: String, Integer, Boolean with full constraint support
 - Object validation for Map-based structures
 - Pattern matching result handling
-- Detailed error reporting with paths
-- Zero reflection design for performance
-- GraalVM native image compatibility
-- Comprehensive test suite and performance benchmarks</content>
+- Zero-reflection design for optimal performance
+- GraalVM native image support
+- Detailed error reporting with path information</content>
 <parameter name="filePath">/home/pepe/Desktop/Github DevWork/Software/Jod/CHANGELOG.md
